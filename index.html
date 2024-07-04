@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자 기억 게임</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<style>
+    body{
+        background-color: lightgray;
+    }
+
+    .container > div {
+        display: block;
+        unicode-bidi: isolate;
+        width: 300px;
+        text-align: center;
+        margin: 250px auto 20px auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .gNumber {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+</style>
+<script type="module">
+    /**
+     * 1. 숫자를 기억하고 맞추는 숫자 기억 게임을 만듭니다.
+     * 2. 시작 버튼 클릭 시 1000 ~ 9999의 숫자가 무작위로 나타납니다. 이때, 3초 뒤에 숫자가 다시 사라집니다.
+     * 3. 사용자가 숫자를 입력하고, 제출 버튼을 통해 정답 유무를 확인합니다.
+     * 3-a. 정답 시 “정답입니다!”를 노출합니다
+     * 3-b. 오답 시 “오답입니다. 정답은 [정답숫자]입니다.”를 노출합니다.
+     * 4.(선택 사항) CSS로 간단한 스타일을 적용합니다.
+     * 5.(선택 사항) 사용자 경험을 향상시키기 위한 기능을 추가합니다. (e.g. 남은 시간초 노출, 텍스트 입력 시 안내 문구 노출, 점수 표시 등)
+     **/
+
+    let min = 1000;
+    let max = 9999;
+    let gameNumber = parseInt(Math.random() * (max - min) + min);
+    let timerCount = 3000; // 3초 
+    let timerId = null;
+
+
+    function intervalTimer(endTime, timeout) {
+        timerId = setInterval(() => {
+            const now = Date.now();
+            const end = endTime.getTime();
+            const timeLeft = parseFloat((end - now) / 1000).toFixed(1);
+            $('#timer').text(`남은 시간: ${timeLeft}초`);
+            if (timeLeft <= 0) {
+                $('#timer').empty();
+                clearInterval(timerId);
+                timerId = null;
+            }
+        }, timeout);
+    }
+
+    $("#gameStart").click(async function () {
+        $('#result').empty();
+        if (timerId) {
+            console.log('타이머가 동작중입니다.');
+            return false;
+        }
+
+        $('#gameNumber').text(gameNumber);
+        $('#gameNumber').show();
+
+        setTimeout(function () {
+            $('#gameNumber').hide();
+        }, timerCount);
+
+        // 타이머 시작
+        intervalTimer(new Date(Date.now() + timerCount), 100);
+
+
+    });
+
+    $("#submt").click(async function () {
+        submit();
+    });
+
+    $("#userAnswer").on("keyup", function (key) {
+        if (key.keyCode === 13) {
+            submit();
+        }
+    })
+
+    function submit() {
+        let userAnswer = Number($("#userAnswer").val());
+
+        if (timerId) {
+            console.log('타이머가 동작중입니다.');
+            return false;
+        }
+
+        if (userAnswer < 1) {
+            $('#result').text(`정답을 입력해주세요!`);
+        } else if (gameNumber === userAnswer) {
+            $('#result').text(`정답입니다!`);
+        } else {
+            $('#result').text(`오답입니다. 정답은 [${gameNumber}]`);
+        }
+    }
+
+
+</script>
+
+<body>
+    <div class="container">
+        <div>
+            <h1>숫자 기억 게임</h1>
+            <input id="userAnswer" type="text">
+            <button id="gameStart">시작</button>
+            <button id="submt">제출</button>
+            <p class="gNumber" id="gameNumber" style="display: none;"></p>
+            <p id="timer"></p>
+            <p id="result"></p>
+        </div>
+    </div>
+</body>
+
+</html>
