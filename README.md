@@ -27,6 +27,7 @@
 </p>
 
 
-
+### 참조 블로그
+- [[Javascript] 타이머를 구현하는 방법](https://velog.io/@apparatus1/timer)
 
 
